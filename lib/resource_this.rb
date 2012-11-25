@@ -17,7 +17,7 @@ module ResourceThis # :nodoc:
       resource_url          = options[:path_prefix] + resource_url unless options[:path_prefix].nil?
       collection_url        = options[:path_prefix] + collection_url unless options[:path_prefix].nil?
 
-      class_inheritable_accessor :resource_this_finder_options
+      class_attribute :resource_this_finder_options
       self.resource_this_finder_options = options[:finder_options] || {}
 
       unless options[:nested].nil?
