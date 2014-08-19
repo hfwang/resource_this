@@ -3,12 +3,16 @@ resouce_this
 
 Not scaffolding. Resourcing. Creates extremely customizable resource controllers with one line of code.
 
+
+```ruby
   class PostsController < ActionController::Base
    resource_this
   end
+```
 
 ...will generate the following code:
 
+```ruby
   class PostsController < ActionController::Base
     before_filter :load_post, :only => [ :show, :edit, :update, :destroy ]
     before_filter :load_posts, :only => [ :index ]
@@ -21,32 +25,32 @@ Not scaffolding. Resourcing. Creates extremely customizable resource controllers
     def load_post
       @post = Post.find(params[:id])
     end
-  
+
     def new_post
       @post = Post.new
     end
-  
+
     def create_post
       returning true do
         @post = Post.new(params[:post])
         @created = @post.save
       end
     end
-  
+
     def update_post
       returning true do
         @updated = @post.update_attributes(params[:post])
       end
     end
-  
+
     def destroy_post
       @post = @post.destroy
     end
-  
+
     def load_posts
       @posts = Post.find(:all)
     end
-  
+
   public
     def index
       respond_to do |format|
@@ -56,7 +60,7 @@ Not scaffolding. Resourcing. Creates extremely customizable resource controllers
       end
     end
 
-    def show          
+    def show
       respond_to do |format|
         format.html
         format.xml  { render :xml => @post }
@@ -64,7 +68,7 @@ Not scaffolding. Resourcing. Creates extremely customizable resource controllers
       end
     end
 
-    def new          
+    def new
       respond_to do |format|
         format.html { render :action => :edit }
         format.xml  { render :xml => @post }
@@ -85,7 +89,7 @@ Not scaffolding. Resourcing. Creates extremely customizable resource controllers
           format.js
         end
       end
-    end 
+    end
 
     def edit
       respond_to do |format|
@@ -109,7 +113,7 @@ Not scaffolding. Resourcing. Creates extremely customizable resource controllers
       end
     end
 
-    def destroy          
+    def destroy
       respond_to do |format|
         format.html { redirect_to :action => posts_url }
         format.xml  { head :ok }
@@ -117,36 +121,44 @@ Not scaffolding. Resourcing. Creates extremely customizable resource controllers
       end
     end
   end
+```
 
 Nested Resources
 ===========
 
+```ruby
   class CommentsController < ActionController::Base
     resource_this :nested => [:posts]
   end
+```
 
 This generates a very similar controller to the one above with adjusted redirects and one additional before_filter / loader method pair to grab the parent resource. In this case:
 
+```ruby
   before_filter :load_post
-  
+
   def load_post
     @post = Post.find(params[:post_id])
   end
-  
+```
+
 Sorting, etc
 ===========
 
+```ruby
   class CommentsController < ActionController::Base
     resource_this :finder_options => {:order => 'created_on'}
   end
-  
+```
+
 ...or, for lazily evaluated sorting options:
 
+```ruby
   class CommentsController < ActionController::Base
     resource_this :finder_options => Proc.new { finder_options }
-    
+
   protected
-  
+
     def finder_options
       order = case params[:sort]
         when 'date_reverse'          then 'created_on desc'
@@ -154,23 +166,26 @@ Sorting, etc
       end
       {:order => order, :limit => params[:limit] || 10 }
     end
-    
+
   end
+```
 
 will_paginate
 ===========
 
 will_paginate support is baked right in:
 
+```ruby
   class CommentsController < ActionController::Base
     resource_this :will_paginate => true
   end
-  
+```
+
 This works with the :finder_options option as well
-  
+
 Opinionated Software
 ===========
-  
+
 The separation of logic - DB operations in before_filters, rendering in the standard resource controller methods - makes this approach ridiculously easy to customize. Need to load an additional object for the :show action? Slap another before_filter on it. Need to change the path that the :update action redirects to? Override the :update action with your new rendering behavior.
 
 Generator
